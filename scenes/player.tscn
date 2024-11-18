@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cq5bo2ho7onmp"]
+
+[ext_resource type="Script" path="res://src/scripts/Player.cs" id="1_peb0a"]
+[ext_resource type="Texture2D" uid="uid://bjqcguxsn0ka0" path="res://icon.svg" id="2_431hv"]
+
+[node name="player" type="CharacterBody2D" node_paths=PackedStringArray("playercam")]
+script = ExtResource("1_peb0a")
+playercam = NodePath("Camera2D")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_431hv")
+
+[node name="Camera2D" type="Camera2D" parent="."]
