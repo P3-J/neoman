@@ -1,4 +1,5 @@
 using Godot;
+using Newtonsoft.Json;
 using System;
 
 public partial class Player : CharacterBody2D
@@ -16,8 +17,10 @@ public partial class Player : CharacterBody2D
     public override void _Ready()
     {
         base._Ready();
+		World.ClientNode.MoveSync += onPlayerDataSync;
 
 		//playercam.Enabled = IsLocalPlayer;
+
     }
 
     public override void _PhysicsProcess(double delta)
@@ -39,6 +42,28 @@ public partial class Player : CharacterBody2D
 
 		Velocity = velocity;
 		MoveAndSlide();
+		SyncPosition();
+	}
+
+    private void SyncPosition()
+    {
+        PlayerSyncData playersyncdata = new PlayerSyncData() {
+			id = UserId,
+			Position = GlobalPosition,
+			UserName = Name
+		};
+
+		World.SyncData(JsonConvert.SerializeObject(playersyncdata), 1);
+    }
+
+    private void onPlayerDataSync(string data){
+
+		var playerdata = JsonConvert.DeserializeObject<PlayerSyncData>(data);
+
+		if (playerdata.id == UserId){
+			GlobalPosition = playerdata.Position;
+		}
+
 	}
 
 

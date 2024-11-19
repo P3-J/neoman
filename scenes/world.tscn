@@ -13,7 +13,7 @@ playerscene = ExtResource("2_0syoo")
 
 [node name="world" type="Sprite2D" parent="scenemanager"]
 modulate = Color(1, 1, 0, 1)
-position = Vector2(593, 96)
+position = Vector2(693, 90)
 texture = ExtResource("2_131ka")
 
 [node name="Camera2D" type="Camera2D" parent="scenemanager"]
@@ -27,10 +27,10 @@ offset_bottom = 40.0
 
 [node name="ColorRect" type="ColorRect" parent="hud"]
 layout_mode = 0
-offset_left = 220.0
-offset_top = 196.0
-offset_right = 713.0
-offset_bottom = 386.0
+offset_left = -244.0
+offset_top = 120.0
+offset_right = 249.0
+offset_bottom = 310.0
 
 [node name="p1" type="Button" parent="hud/ColorRect"]
 layout_mode = 0
@@ -41,6 +41,7 @@ offset_bottom = 110.0
 text = "p1"
 
 [node name="p2" type="Button" parent="hud/ColorRect"]
+layout_mode = 0
 offset_left = 133.0
 offset_top = 80.0
 offset_right = 171.0
@@ -55,6 +56,13 @@ offset_right = 286.0
 offset_bottom = 112.0
 text = "join
 "
+
+[node name="username" type="RichTextLabel" parent="hud/ColorRect"]
+layout_mode = 0
+offset_left = 336.0
+offset_top = 86.0
+offset_right = 462.0
+offset_bottom = 150.0
 
 [connection signal="pressed" from="hud/ColorRect/p1" to="." method="_on_p_1_pressed"]
 [connection signal="pressed" from="hud/ColorRect/p2" to="." method="_on_p_2_pressed"]

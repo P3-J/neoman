@@ -3,14 +3,19 @@ using System;
 using Nakama;
 using System.Linq;
 using Godot.Collections;
+using System.Net;
+using Nakama.TinyJson;
+using System.Text;
+using Newtonsoft.Json;
 
 public partial class World : Node2D
 {
 
 	[Export] Control hud;
 	[Export] PackedScene playerscene;
-
-	public Client Client;
+	[Signal] public delegate void MoveSyncEventHandler(string data);
+	public static Client Client;
+	public static World ClientNode;
 	private ISession Session;
 	private static ISocket Socket;
 	private static IMatch Match; // current lobby pretty much
@@ -24,9 +29,11 @@ public partial class World : Node2D
 	{
 		GD.Print("Hello World");
 
-		if (Client != null)
+		if (ClientNode != null)
 		{
 			QueueFree();
+		} else {
+			ClientNode = this;
 		}
 
         Client = new Client("http", "127.0.0.1", 7350, "defaultkey");
@@ -37,12 +44,16 @@ public partial class World : Node2D
     {
         try
         {
-            Session = await Client.AuthenticateEmailAsync(email, password, name);
+            Session = await Client.AuthenticateEmailAsync(email, password, name, create:false);
             GD.Print("User authenticated, session ID: ", Session.UserId);
+			// 2146233088 no acc
+			// 2146233088 invalid creds
+			// 2146755329 
         }
         catch (Exception e)
         {
             GD.PrintErr("Authentication failed: ", e.Message);
+			GD.PrintErr("extra: ", e.Data.ToJson());
         }
     }
 
@@ -61,6 +72,7 @@ public partial class World : Node2D
 
 	private void _on_p_1_pressed(){
 		AuthenticateUser("user@user.com", "Password123!", "tester");
+		
 	}
 
 	private void _on_p_2_pressed(){
@@ -75,12 +87,13 @@ public partial class World : Node2D
 		GD.Print("Joined " , Match.Id);
 
 		Socket.ReceivedMatchPresence += onMatchPresence;
+		Socket.ReceivedMatchState    += onMatchState;
 
 		if (!Match.Presences.Any()){
 			IsHost = true;
 		}
 
-		AddPlayer(Session.UserId, Session.UserId);
+		AddPlayer(Session.UserId, Session.Username);
 		hud.Visible = false;
 	}
 
@@ -88,9 +101,49 @@ public partial class World : Node2D
     {
         foreach(var presence in @event.Joins){
 
-			AddPlayer(presence.UserId, presence.UserId);
-			GD.Print("new player joined");
+			AddPlayer(presence.UserId, presence.Username);
+			SyncUpAllPlayers(presence.UserId);
+			GD.Print("new player joined: ", presence.Username);
 		}
     }
+
+    private void SyncUpAllPlayers(string userId)
+    {
+        
+		foreach (var pInstance in playerInstances.Values){
+			if (pInstance.UserId != userId){
+
+				PlayerSyncData syncdata = new PlayerSyncData(){
+					Position = pInstance.GlobalPosition,
+					id = pInstance.UserId,
+					UserName = pInstance.Name,
+				};
+
+				SyncData(JsonConvert.SerializeObject(syncdata), 2);
+			}
+		}
+    }
+
+    public static async void SyncData(string data, int opcode){
+		await Socket.SendMatchStateAsync(Match.Id, opcode, data);
+	}
+
+	private void onMatchState(IMatchState state){
+		string data = Encoding.UTF8.GetString(state.State);
+		switch (state.OpCode){
+
+			case 1:
+				CallDeferred("EmitPlayerSyncDataSignal", data);
+				break;
+			case 2:
+				PlayerSyncData syncdata = JsonConvert.DeserializeObject<PlayerSyncData>(data);
+				CallDeferred("AddPlayer", syncdata.id, syncdata.UserName);
+				break;
+		}
+	}
+
+	private void EmitPlayerSyncDataSignal(string data){
+		EmitSignal("MoveSync", data);
+	}
 
 }
