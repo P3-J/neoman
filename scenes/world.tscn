@@ -4,10 +4,11 @@
 [ext_resource type="PackedScene" uid="uid://cq5bo2ho7onmp" path="res://scenes/player.tscn" id="2_0syoo"]
 [ext_resource type="Texture2D" uid="uid://bjqcguxsn0ka0" path="res://icon.svg" id="2_131ka"]
 
-[node name="world" type="Node2D" node_paths=PackedStringArray("hud")]
+[node name="world" type="Node2D" node_paths=PackedStringArray("hud", "worldcam")]
 script = ExtResource("1_4r1ne")
 hud = NodePath("hud")
 playerscene = ExtResource("2_0syoo")
+worldcam = NodePath("scenemanager/Camera2D")
 
 [node name="scenemanager" type="Node2D" parent="."]
 

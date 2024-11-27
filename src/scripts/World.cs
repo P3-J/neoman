@@ -13,6 +13,7 @@ public partial class World : Node2D
 
 	[Export] Control hud;
 	[Export] PackedScene playerscene;
+	[Export] Camera2D worldcam;
 	[Signal] public delegate void MoveSyncEventHandler(string data);
 	public static Client Client;
 	public static World ClientNode;
@@ -46,9 +47,6 @@ public partial class World : Node2D
         {
             Session = await Client.AuthenticateEmailAsync(email, password, name, create:false);
             GD.Print("User authenticated, session ID: ", Session.UserId);
-			// 2146233088 no acc
-			// 2146233088 invalid creds
-			// 2146755329 
         }
         catch (Exception e)
         {
@@ -63,7 +61,11 @@ public partial class World : Node2D
 
 		player.UserId = userId;
 		player.Name = userName;
-		player.IsLocalPlayer = userId == Session.UserId;
+
+		if (userId == Session.UserId){
+			player.IsLocalPlayer = true;
+			worldcam.Enabled = false;
+		}
 		playerInstances[userId] = player;
 
 		CallDeferred("add_child", player);
@@ -139,6 +141,19 @@ public partial class World : Node2D
 				PlayerSyncData syncdata = JsonConvert.DeserializeObject<PlayerSyncData>(data);
 				CallDeferred("AddPlayer", syncdata.id, syncdata.UserName);
 				break;
+			case 3:
+				BulletCreateSyncData bsyncdata = JsonConvert.DeserializeObject<BulletCreateSyncData>(data);
+				CallDeferred("InstanceBullet", bsyncdata.Direction, bsyncdata.GlobalPosition, bsyncdata.id);
+				break;
+		}
+	}
+
+	public void InstanceBullet(Vector2 dir, Vector2 globalpos, string id){
+		foreach (var pInstance in playerInstances.Values){
+			if (pInstance.UserId == id){
+				pInstance._FireBullet(dir, globalpos, id);
+				break;
+			}      
 		}
 	}
 

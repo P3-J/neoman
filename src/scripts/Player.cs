@@ -4,12 +4,12 @@ using System;
 
 public partial class Player : CharacterBody2D
 {
+	[Export] PackedScene BulletPacked;
 	public const float Speed = 300.0f;
 	public const float JumpVelocity = -400.0f;
 
 	public string UserId;
-
-	public bool IsLocalPlayer;
+	public bool IsLocalPlayer = false;
 
 	[Export] Camera2D playercam;
 
@@ -19,7 +19,7 @@ public partial class Player : CharacterBody2D
         base._Ready();
 		World.ClientNode.MoveSync += onPlayerDataSync;
 
-		//playercam.Enabled = IsLocalPlayer;
+		playercam.Enabled = IsLocalPlayer;
 
     }
 
@@ -45,6 +45,41 @@ public partial class Player : CharacterBody2D
 		SyncPosition();
 	}
 
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+		if (!IsLocalPlayer) {return;}
+		
+		if (Input.IsActionJustPressed("lmb")){
+			FireBullet();
+		}
+    }
+
+
+	public void FireBullet(){
+
+		Bullet bInstance = (Bullet)BulletPacked.Instantiate();
+		var camera = GetViewport().GetCamera2D();
+		var mspos = camera.GetGlobalMousePosition();
+
+		bInstance.dir = (mspos - GlobalPosition).Normalized();
+		bInstance.Position = Position;
+		bInstance.LookAt(mspos);
+		GetTree().CurrentScene.AddChild(bInstance);
+		
+		if (IsLocalPlayer){
+			SyncBullet(Position, (mspos - GlobalPosition).Normalized());
+		}
+	}
+
+	public void _FireBullet(Vector2 dir, Vector2 globalpos, string userid){
+		// for non local
+		Bullet bInstance = (Bullet)BulletPacked.Instantiate();
+		bInstance.dir = dir;
+		bInstance.Position = globalpos;
+		GetTree().CurrentScene.AddChild(bInstance);
+	}
+
     private void SyncPosition()
     {
         PlayerSyncData playersyncdata = new PlayerSyncData() {
@@ -55,6 +90,19 @@ public partial class Player : CharacterBody2D
 
 		World.SyncData(JsonConvert.SerializeObject(playersyncdata), 1);
     }
+
+	private void SyncBullet(Vector2 globalpos, Vector2 dir){
+
+		BulletCreateSyncData bulletcreatedata = new BulletCreateSyncData(){
+			GlobalPosition = globalpos,
+			Direction = dir,
+			id = UserId
+		};
+
+		World.SyncData(JsonConvert.SerializeObject(bulletcreatedata), 3);
+
+	}
+
 
     private void onPlayerDataSync(string data){
 
