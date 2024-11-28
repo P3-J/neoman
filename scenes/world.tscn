@@ -4,8 +4,9 @@
 [ext_resource type="PackedScene" uid="uid://cq5bo2ho7onmp" path="res://scenes/player.tscn" id="2_0syoo"]
 [ext_resource type="Texture2D" uid="uid://bjqcguxsn0ka0" path="res://icon.svg" id="2_131ka"]
 
-[node name="world" type="Node2D" node_paths=PackedStringArray("hud", "worldcam")]
+[node name="world" type="Node2D" node_paths=PackedStringArray("lobbybox", "hud", "worldcam")]
 script = ExtResource("1_4r1ne")
+lobbybox = NodePath("hud/lobby/list")
 hud = NodePath("hud")
 playerscene = ExtResource("2_0syoo")
 worldcam = NodePath("scenemanager/Camera2D")
@@ -26,14 +27,14 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="ColorRect" type="ColorRect" parent="hud"]
+[node name="menu" type="ColorRect" parent="hud"]
 layout_mode = 0
-offset_left = -244.0
-offset_top = 120.0
-offset_right = 249.0
-offset_bottom = 310.0
+offset_left = 123.0
+offset_top = -181.0
+offset_right = 616.0
+offset_bottom = 9.0
 
-[node name="p1" type="Button" parent="hud/ColorRect"]
+[node name="p1" type="Button" parent="hud/menu"]
 layout_mode = 0
 offset_left = 65.0
 offset_top = 79.0
@@ -41,7 +42,7 @@ offset_right = 103.0
 offset_bottom = 110.0
 text = "p1"
 
-[node name="p2" type="Button" parent="hud/ColorRect"]
+[node name="p2" type="Button" parent="hud/menu"]
 layout_mode = 0
 offset_left = 133.0
 offset_top = 80.0
@@ -49,7 +50,7 @@ offset_right = 171.0
 offset_bottom = 111.0
 text = "p2"
 
-[node name="join" type="Button" parent="hud/ColorRect"]
+[node name="join" type="Button" parent="hud/menu"]
 layout_mode = 0
 offset_left = 249.0
 offset_top = 81.0
@@ -58,13 +59,40 @@ offset_bottom = 112.0
 text = "join
 "
 
-[node name="username" type="RichTextLabel" parent="hud/ColorRect"]
+[node name="lobby" type="ColorRect" parent="hud"]
 layout_mode = 0
-offset_left = 336.0
-offset_top = 86.0
-offset_right = 462.0
-offset_bottom = 150.0
+offset_left = -396.0
+offset_top = 31.0
+offset_right = 47.0
+offset_bottom = 363.0
+color = Color(0, 0, 0, 1)
 
-[connection signal="pressed" from="hud/ColorRect/p1" to="." method="_on_p_1_pressed"]
-[connection signal="pressed" from="hud/ColorRect/p2" to="." method="_on_p_2_pressed"]
-[connection signal="pressed" from="hud/ColorRect/join" to="." method="_on_join_pressed"]
+[node name="lobbyname" type="Label" parent="hud/lobby"]
+layout_mode = 2
+offset_top = 11.0
+offset_right = 443.0
+offset_bottom = 34.0
+text = "Lobby : test"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="list" type="VBoxContainer" parent="hud/lobby"]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 55.0
+offset_right = 425.0
+offset_bottom = 301.0
+theme_override_constants/separation = 10
+
+[node name="readybutton" type="Button" parent="hud/lobby"]
+layout_mode = 0
+offset_left = 156.0
+offset_top = 269.0
+offset_right = 296.0
+offset_bottom = 333.0
+text = "start"
+
+[connection signal="pressed" from="hud/menu/p1" to="." method="_on_p_1_pressed"]
+[connection signal="pressed" from="hud/menu/p2" to="." method="_on_p_2_pressed"]
+[connection signal="pressed" from="hud/menu/join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="hud/lobby/readybutton" to="." method="_on_readybutton_pressed"]

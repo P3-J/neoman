@@ -3,7 +3,6 @@ using System;
 using Nakama;
 using System.Linq;
 using Godot.Collections;
-using System.Net;
 using Nakama.TinyJson;
 using System.Text;
 using Newtonsoft.Json;
@@ -24,6 +23,7 @@ public partial class World : Node2D
 	public bool IsHost { get; private set; } // match host p2p
 
 	private Dictionary<string, Player> playerInstances = new Dictionary<string, Player>(); 
+	private Dictionary<string, string> userInstances = new Dictionary<string, string>(); 
 
 
 	public override void _Ready()
@@ -95,25 +95,27 @@ public partial class World : Node2D
 			IsHost = true;
 		}
 
-		AddPlayer(Session.UserId, Session.Username);
-		hud.Visible = false;
+		AddPlayerToLobby(Session.UserId, Session.Username);
+		//AddPlayer(Session.UserId, Session.Username);
+		//hud.Visible = false;
 	}
 
     private void onMatchPresence(IMatchPresenceEvent @event)
     {
         foreach(var presence in @event.Joins){
-
-			AddPlayer(presence.UserId, presence.Username);
-			SyncUpAllPlayers(presence.UserId);
+			AddPlayerToLobby(presence.UserId, presence.Username);
+			//AddPlayer(presence.UserId, presence.Username);
+			//SyncUpAllPlayers(presence.UserId);
+			SyncLobby(presence.UserId);
 			GD.Print("new player joined: ", presence.Username);
 		}
     }
 
     private void SyncUpAllPlayers(string userId)
     {
-        
+        // gets the pos and creates the other person
 		foreach (var pInstance in playerInstances.Values){
-			if (pInstance.UserId != userId){
+			if (true/* pInstance.UserId != userId */){
 
 				PlayerSyncData syncdata = new PlayerSyncData(){
 					Position = pInstance.GlobalPosition,
@@ -144,6 +146,10 @@ public partial class World : Node2D
 			case 3:
 				BulletCreateSyncData bsyncdata = JsonConvert.DeserializeObject<BulletCreateSyncData>(data);
 				CallDeferred("InstanceBullet", bsyncdata.Direction, bsyncdata.GlobalPosition, bsyncdata.id);
+				break;
+			case 4:
+				lobbysyncdata lobbysyncdata = JsonConvert.DeserializeObject<lobbysyncdata>(data);
+				CallDeferred("AddPlayerToLobby", lobbysyncdata.USERID, lobbysyncdata.USERNAME);
 				break;
 		}
 	}

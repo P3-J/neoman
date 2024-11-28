@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://n1kvs76syu48"]
+
+[ext_resource type="Texture2D" uid="uid://bjqcguxsn0ka0" path="res://icon.svg" id="1_8u8jr"]
+[ext_resource type="Script" path="res://src/scripts/Lobbyuser.cs" id="1_130iw"]
+
+[node name="lobbyuser" type="Label" node_paths=PackedStringArray("readycheck")]
+text = "username
+"
+script = ExtResource("1_130iw")
+readycheck = NodePath("Sprite2D")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0, 5.405, 0, 1)
+position = Vector2(385, 12.75)
+scale = Vector2(0.265625, 0.191406)
+texture = ExtResource("1_8u8jr")
