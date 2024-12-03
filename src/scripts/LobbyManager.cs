@@ -13,6 +13,9 @@ public partial class World : Node2D
 
     private void AddPlayerToLobby(string userid, string username)
     {
+
+        if (userInstances.ContainsKey(userid)) { return;}
+
         Lobbyuser listobj = lobbypacked.Instantiate<Lobbyuser>();
         listobj.SetPlayerName(username);
         userInstances[userid] = username;
@@ -21,8 +24,9 @@ public partial class World : Node2D
 
     private void SyncLobby(string userId)
     {
+
 		foreach (var user in userInstances){
-			if (user.Key != userId){
+			if (user.Key != userId ){
 				lobbysyncdata syncdata = new lobbysyncdata(){
 					USERID = user.Key,
 					USERNAME = user.Value,

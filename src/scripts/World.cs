@@ -45,7 +45,7 @@ public partial class World : Node2D
     {
         try
         {
-            Session = await Client.AuthenticateEmailAsync(email, password, name, create:false);
+            Session = await Client.AuthenticateEmailAsync(email, password, name, create:true);
             GD.Print("User authenticated, session ID: ", Session.UserId);
         }
         catch (Exception e)
@@ -68,6 +68,8 @@ public partial class World : Node2D
 		}
 		playerInstances[userId] = player;
 
+		hud.Visible = false;
+
 		CallDeferred("add_child", player);
 
 	}
@@ -76,9 +78,16 @@ public partial class World : Node2D
 		AuthenticateUser("user@user.com", "Password123!", "tester");
 		
 	}
-
 	private void _on_p_2_pressed(){
 		AuthenticateUser("user1@user.com", "Password123!", "tester2");
+	}
+
+	private void _on_p_3_pressed(){
+		AuthenticateUser("user2@user.com", "Password123!", "tester3");
+	}
+
+	private void _on_p_4_pressed(){
+		AuthenticateUser("user3@user.com", "Password123!", "tester4");
 	}
 
 	private async void _on_join_pressed(){

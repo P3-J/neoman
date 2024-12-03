@@ -59,6 +59,22 @@ offset_bottom = 112.0
 text = "join
 "
 
+[node name="p3" type="Button" parent="hud/menu"]
+offset_left = 133.0
+offset_top = 129.0
+offset_right = 171.0
+offset_bottom = 160.0
+text = "p3
+"
+
+[node name="p4" type="Button" parent="hud/menu"]
+offset_left = 63.0
+offset_top = 134.0
+offset_right = 101.0
+offset_bottom = 165.0
+text = "p4
+"
+
 [node name="lobby" type="ColorRect" parent="hud"]
 layout_mode = 0
 offset_left = -396.0
@@ -95,4 +111,6 @@ text = "start"
 [connection signal="pressed" from="hud/menu/p1" to="." method="_on_p_1_pressed"]
 [connection signal="pressed" from="hud/menu/p2" to="." method="_on_p_2_pressed"]
 [connection signal="pressed" from="hud/menu/join" to="." method="_on_join_pressed"]
+[connection signal="pressed" from="hud/menu/p3" to="." method="_on_p_3_pressed"]
+[connection signal="pressed" from="hud/menu/p4" to="." method="_on_p_4_pressed"]
 [connection signal="pressed" from="hud/lobby/readybutton" to="." method="_on_readybutton_pressed"]
